@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		7711D46E288969FE008E64C8 /* NewsLineNetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7711D46D288969FE008E64C8 /* NewsLineNetworkManager.swift */; };
+		77B4ABF5288AEDED00FC8645 /* DetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77B4ABF4288AEDED00FC8645 /* DetailVC.swift */; };
 		77C9216628880CB100E2A913 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77C9216528880CB100E2A913 /* AppDelegate.swift */; };
 		77C9216828880CB100E2A913 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77C9216728880CB100E2A913 /* SceneDelegate.swift */; };
 		77C9216D28880CB100E2A913 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 77C9216B28880CB100E2A913 /* Main.storyboard */; };
@@ -20,6 +21,7 @@
 
 /* Begin PBXFileReference section */
 		7711D46D288969FE008E64C8 /* NewsLineNetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsLineNetworkManager.swift; sourceTree = "<group>"; };
+		77B4ABF4288AEDED00FC8645 /* DetailVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailVC.swift; sourceTree = "<group>"; };
 		77C9216228880CB100E2A913 /* PostsApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PostsApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		77C9216528880CB100E2A913 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		77C9216728880CB100E2A913 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -79,6 +81,7 @@
 			isa = PBXGroup;
 			children = (
 				77C9217A2888135400E2A913 /* NewslineVC.swift */,
+				77B4ABF4288AEDED00FC8645 /* DetailVC.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -193,6 +196,7 @@
 				77C9216628880CB100E2A913 /* AppDelegate.swift in Sources */,
 				77C9217E28882D1700E2A913 /* NewslineCell.swift in Sources */,
 				77C9216828880CB100E2A913 /* SceneDelegate.swift in Sources */,
+				77B4ABF5288AEDED00FC8645 /* DetailVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

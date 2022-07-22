@@ -4,6 +4,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -76,14 +77,7 @@
                                             </constraints>
                                             <state key="normal" title="Button"/>
                                             <buttonConfiguration key="configuration" style="plain">
-                                                <attributedString key="attributedTitle">
-                                                    <fragment content="Expand">
-                                                        <attributes>
-                                                            <font key="NSFont" size="18" name="Avenir-Medium"/>
-                                                            <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
-                                                        </attributes>
-                                                    </fragment>
-                                                </attributedString>
+                                                <attributedString key="attributedTitle"/>
                                                 <color key="baseForegroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             </buttonConfiguration>
                                             <connections>
@@ -117,6 +111,7 @@
                                     <outlet property="likesCountLabel" destination="gkf-0y-Uge" id="WuF-hy-LeD"/>
                                     <outlet property="subTitleLabel" destination="pS1-GZ-ULM" id="Lj5-l0-Dkj"/>
                                     <outlet property="titleLabel" destination="M4G-yl-Xrq" id="2Ge-ST-asX"/>
+                                    <segue destination="pn8-sI-sEI" kind="show" id="uWq-tD-ilA"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -141,6 +136,22 @@
             </objects>
             <point key="canvasLocation" x="-1014" y="102"/>
         </scene>
+        <!--PostsApp-->
+        <scene sceneID="0Aw-JI-a8f">
+            <objects>
+                <viewController storyboardIdentifier="DetailVC" id="pn8-sI-sEI" customClass="DetailVC" customModule="PostsApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="se5-ag-1RI">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="k0i-zL-OUY"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="PostsApp" id="GtU-no-1ug"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="xLI-yb-d0M" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-286.95652173913044" y="101.78571428571428"/>
+        </scene>
         <!--Navigation Controller-->
         <scene sceneID="nvH-Og-ArY">
             <objects>
@@ -148,6 +159,7 @@
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="M5t-cu-4Aq">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </navigationBar>
                     <connections>
                         <segue destination="Gpa-IK-BPU" kind="relationship" relationship="rootViewController" id="TP6-ed-iAQ"/>
