@@ -11,8 +11,14 @@ class NewslineVC: UITableViewController {
     static let shared = NewslineVC()
     
     var networkManager = NetworkManager()
+    var detailNetworkManager = DetailNetworkManager()
+    
     var dataSourse = [Post]()
+    var postDatailData: PostDetail?
     var eachCellStatus: [Bool] = []
+    var labelsSize: [Int] = []
+    var detailPostURL = "https://raw.githubusercontent.com/anton-natife/jsons/master/api/posts/111.json"
+    
     
     let nowTimeStamp: String = {
         let objDateformat: DateFormatter = DateFormatter()
@@ -29,7 +35,10 @@ class NewslineVC: UITableViewController {
         super.viewDidLoad()
         
         self.tableView.showsVerticalScrollIndicator = false
-        
+        downloadNewslinePosts()
+    }
+    
+    func downloadNewslinePosts() {
         networkManager.obtainPost { [weak self] (result) in
             switch result {
             case .success(let posts):
@@ -49,26 +58,43 @@ class NewslineVC: UITableViewController {
         }
     }
     
+    func dowloadDetailPostData(urlString: String) {
+        detailNetworkManager.obtainPost(url: urlString) { [weak self] (result) in
+            switch result {
+            case .success(let posts):
+                // возврат результата в главном потоке
+                self?.postDatailData = posts
+                
+            case .failure(let error):
+                debugPrint("Error: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    
+    // MARK: Filter Posts
     @IBAction func filterButton(_ sender: UIBarButtonItem) {
         showFilterAlert()
-        self.tableView.reloadData()
+        tableView.reloadData()
     }
     
     func showFilterAlert() {
         let alert = UIAlertController(title: "Sort by:", message: nil, preferredStyle: .alert)
         
-        let sortByRating = UIAlertAction(title: "Rating", style: .default) { action in
+        let sortByRating = UIAlertAction(title: "Rating", style: .default) { _ in
             showSotrByRatingAlert()
         }
-        
-        let sortByDate = UIAlertAction(title: "Date", style: .default) { action in
+        let sortByDate = UIAlertAction(title: "Date", style: .default) { _ in
             showSotrByDateAlert()
         }
-        
+        let sortByDefault = UIAlertAction(title: "Default", style: .default) { _ in
+            self.downloadNewslinePosts()
+        }
         let cancelButton = UIAlertAction(title: "Cancel", style: .destructive, handler: nil)
         
         alert.addAction(sortByRating)
         alert.addAction(sortByDate)
+        alert.addAction(sortByDefault)
         alert.addAction(cancelButton)
         self.present(alert, animated: true, completion: nil)
         
@@ -115,6 +141,8 @@ class NewslineVC: UITableViewController {
         
     }
     
+    // MARK: Helpers
+    
     func getCurrentTimeStampWOMiliseconds(dateToConvert: NSDate) -> String {
         let objDateformat: DateFormatter = DateFormatter()
         objDateformat.dateFormat = "yyyy-MM-dd"
@@ -126,15 +154,14 @@ class NewslineVC: UITableViewController {
     }
     
     func countLabelLines(label: UILabel) -> Int {
-        // Call self.layoutIfNeeded() if your view uses auto layout
         let myText = label.text! as NSString
-
+        
         let rect = CGSize(width: label.bounds.width, height: CGFloat.greatestFiniteMagnitude)
         let labelSize = myText.boundingRect(with: rect, options: .usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: label.font!], context: nil)
-
+        
         return Int(ceil(CGFloat(labelSize.height) / label.font.lineHeight))
     }
-
+    
     
     // MARK: - Table view data source
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -151,18 +178,17 @@ class NewslineVC: UITableViewController {
             cell.titleLabel.text = data.title
             cell.subTitleLabel.text = data.previewText
             
-            let subTitleLabelNumberOfLine = countLabelLines(label: cell.subTitleLabel)
-            
+            self.labelsSize.append(cell.subTitleLabel.calculateMaxLines())
             
             switch eachCellStatus[indexPath.row] {
-                case true:
-                    if subTitleLabelNumberOfLine <= 2 {
-                        cell.subTitleLabel.numberOfLines = 2
-                        cell.expandButton.isHidden = true
-                    }
+            case true:
+                if  self.labelsSize[indexPath.row] <= 2 {
+                    cell.expandButton.isHidden = true
                     cell.subTitleLabel.numberOfLines = 2
-                case false:
-                    cell.subTitleLabel.numberOfLines = 0
+                }
+                cell.subTitleLabel.numberOfLines = 2
+            case false:
+                cell.subTitleLabel.numberOfLines = 0
             }
             
             cell.likesCountLabel.text = "\(data.likesCount ?? 0)"
@@ -185,10 +211,46 @@ class NewslineVC: UITableViewController {
                 cell.updateButtonTitle(expandStatus: self.eachCellStatus[indexPath.row])
                 tableView.reloadRows(at: [indexPath], with: .automatic)
             }
-            
             return cell
         }
         
         return NewslineCell()
     }
+    
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let postID = dataSourse[indexPath.row].postID
+
+        detailPostURL = "https://raw.githubusercontent.com/anton-natife/jsons/master/api/posts/\(postID!).json"
+        dowloadDetailPostData(urlString: detailPostURL)
+        let detailVC = storyboard?.instantiateViewController(withIdentifier: "DetailVC") as? DetailVC
+
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            
+            if let imageURL = self.postDatailData?.postImage  {
+                let url = URL(string: imageURL)
+                if let data = try? Data(contentsOf: url!) {
+                    detailVC?.postImageView.image = UIImage(data: data)
+                }
+            }
+            
+            detailVC?.titleLabel.text = self.postDatailData?.title
+            detailVC?.subtitleLabel.text = self.postDatailData?.text
+            detailVC?.likesCountLabel.text = "\(self.postDatailData?.likesCount ?? 0)"
+            
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateStyle = .long
+            dateFormatter.timeStyle = .none
+    
+            let date = Date(timeIntervalSince1970:  Double(self.postDatailData?.timeshamp ?? 0))
+            dateFormatter.locale = Locale(identifier: "en_UK")
+            detailVC?.dateOfPublicationLabel.text = "\(dateFormatter.string(from: date))"
+            
+            self.navigationController?.pushViewController(detailVC!, animated: true)
+        }
+        
+    }
+    
+    
 }

@@ -111,7 +111,6 @@
                                     <outlet property="likesCountLabel" destination="gkf-0y-Uge" id="WuF-hy-LeD"/>
                                     <outlet property="subTitleLabel" destination="pS1-GZ-ULM" id="Lj5-l0-Dkj"/>
                                     <outlet property="titleLabel" destination="M4G-yl-Xrq" id="2Ge-ST-asX"/>
-                                    <segue destination="pn8-sI-sEI" kind="show" id="uWq-tD-ilA"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -150,7 +149,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xLI-yb-d0M" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-286.95652173913044" y="101.78571428571428"/>
+            <point key="canvasLocation" x="-259" y="102"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="nvH-Og-ArY">

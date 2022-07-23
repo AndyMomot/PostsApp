@@ -30,7 +30,6 @@ class DetailVC: UIViewController {
     
     var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "The Ingenious Prank Music Legend Mozart Played On Someone He Couldn’t Stand"
         label.font = UIFont(name: "Avenir Heavy", size: 20)
         label.textColor = .black
         label.numberOfLines = 0
@@ -39,7 +38,6 @@ class DetailVC: UIViewController {
     
     var subtitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Sometimes, it takes a little readjustment before a musician finds their feet in a group.\n\nIn this list, we will look at four musicians who have had to switch roles in the bands they were in. Whether it be due to personal preference or outside factors, these artists originally entered their groups with a role very different from what they are known best for today.\n\nWithout further ado, let’s begin!\n\n4. Paul McCartney: Guitar to Bass\n\nInitially reluctant to take over as the bassist for The Beatles, Paul McCartney grew into his role. He later became renowned as a talented multi instrumentalist.\n\n3. Joey Ramone: Drums to Vocals\n\nInitially the drummer for The Ramones, Joey Ramone replaced bassist Dee Dee Ramone as the band’s lead vocalist. As he could not play drums and sing at the same time, he gave up the role of drummer to Tommy Ramone and focused soley on being the band’s main voice.\n\n2. Roger Daltrey: Guitar to Vocals\n\nOne of the most legendary musical front-men, Roger Daltrey was originally meant to be a lead guitarist. When he took charge of the mic however, he also let go of his leadership of The Who. That decision made both him and his band’s icons of music.\n\n1. Phil Collins: Drums to Vocals\n\nInitially a drummer, Phil Collins found himself elevated to the lead singer of Genesis in the wake of Peter Gabriel’s departure. This not only kept Genesis on it’s feet but also allowed Collins to embark on a legendary solo career as a singer."
         label.font = UIFont(name: "Avenir Heavy", size: 18)
         label.textColor = .secondaryLabel
         label.numberOfLines = 0
@@ -73,15 +71,21 @@ class DetailVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setContentView()
         setScrollView()
         setCinstraints()
-        
     }
     
     func setContentView() {
-        let height = postImageView.frame.size.height + titleLabel.frame.size.height + subtitleLabel.frame.size.height + likeImage.frame.size.height + 80
+        let stringHeight = 130
         
+        let postImageViewHeight = view.frame.size.width
+        let titleLabelHeight: CGFloat = CGFloat(titleLabel.calculateMaxLines() * stringHeight)
+        let subtitleLabelHeight: CGFloat = CGFloat(subtitleLabel.calculateMaxLines() * stringHeight)
+
+        let height = postImageViewHeight + titleLabelHeight + subtitleLabelHeight
+
         contentView.frame = CGRect(x: 0, y: 0, width: view.frame.size.width, height: height)
         contentView.addSubview(postImageView)
         contentView.addSubview(titleLabel)
@@ -95,6 +99,7 @@ class DetailVC: UIViewController {
         scrollView = UIScrollView(frame: view.bounds)
         scrollView.addSubview(contentView)
         scrollView.contentSize = self.contentView.bounds.size
+        scrollView.showsVerticalScrollIndicator = false
         self.view.addSubview(scrollView)
     }
     
