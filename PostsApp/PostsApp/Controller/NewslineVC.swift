@@ -1,13 +1,8 @@
-//
-//  newslineVC.swift
-//  PostsApp
-//
-//  Created by Андрей on 20.07.2022.
-//
 
 import UIKit
+import SkeletonView
 
-class NewslineVC: UITableViewController {
+class NewslineVC: UITableViewController { // SkeletonTableViewDataSource
     static let shared = NewslineVC()
     
     var networkManager = NetworkManager()
@@ -16,27 +11,35 @@ class NewslineVC: UITableViewController {
     var dataSourse = [Post]()
     var postDatailData: PostDetail?
     var eachCellStatus: [Bool] = []
-    var labelsSize: [Int] = []
+
     var detailPostURL = "https://raw.githubusercontent.com/anton-natife/jsons/master/api/posts/111.json"
     
-    
-    let nowTimeStamp: String = {
-        let objDateformat: DateFormatter = DateFormatter()
-        objDateformat.dateFormat = "yyyy-MM-dd"
-        let now = NSDate()
-        let strTime: String = objDateformat.string(from: now as Date)
-        let objUTCDate: NSDate = objDateformat.date(from: strTime)! as NSDate
-        let milliseconds: Int64 = Int64(objUTCDate.timeIntervalSince1970)
-        let strTimeStamp: String = "\(milliseconds)"
-        return strTimeStamp
+    let tableRefreshController: UIRefreshControl = {
+        let resreshController = UIRefreshControl()
+        resreshController.addTarget(self, action: #selector(refresh(sender:)), for: .valueChanged)
+        return resreshController
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.tableView.showsVerticalScrollIndicator = false
-        downloadNewslinePosts()
+        self.tableView.refreshControl = tableRefreshController
+
+        self.downloadNewslinePosts()
+        
+        
+    
     }
+
+    func test() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
+            self.view.hideSkeleton(reloadDataAfter: true, transition: .crossDissolve(0))
+            self.tableView.stopSkeletonAnimation()
+        })
+    }
+    
+    // MARK: Networking
     
     func downloadNewslinePosts() {
         networkManager.obtainPost { [weak self] (result) in
@@ -141,7 +144,29 @@ class NewslineVC: UITableViewController {
         
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.tableView.isSkeletonable = true
+        self.tableView.showAnimatedGradientSkeleton(usingGradient: .init(baseColor: .lightGray), animation: nil, transition: .crossDissolve(0))
+    }
+    
     // MARK: Helpers
+    
+    @objc private func refresh(sender: UIRefreshControl) {
+        self.tableView.reloadData()
+        sender.endRefreshing()
+    }
+    
+    let nowTimeStamp: String = {
+        let objDateformat: DateFormatter = DateFormatter()
+        objDateformat.dateFormat = "yyyy-MM-dd"
+        let now = NSDate()
+        let strTime: String = objDateformat.string(from: now as Date)
+        let objUTCDate: NSDate = objDateformat.date(from: strTime)! as NSDate
+        let milliseconds: Int64 = Int64(objUTCDate.timeIntervalSince1970)
+        let strTimeStamp: String = "\(milliseconds)"
+        return strTimeStamp
+    }()
     
     func getCurrentTimeStampWOMiliseconds(dateToConvert: NSDate) -> String {
         let objDateformat: DateFormatter = DateFormatter()
@@ -168,8 +193,12 @@ class NewslineVC: UITableViewController {
         return dataSourse.count
     }
     
+    func collectionSkeletonView(_ skeletonView: UITableView, cellIdentifierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier {
+        return NewslineCell.identifier
+    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if let cell = tableView.dequeueReusableCell(withIdentifier: "newslineCell", for: indexPath) as? NewslineCell {
+        if let cell = tableView.dequeueReusableCell(withIdentifier: NewslineCell.identifier, for: indexPath) as? NewslineCell {
             
             let data = dataSourse[indexPath.row]
             let timeshamp = data.timeshamp ?? 0
@@ -178,15 +207,21 @@ class NewslineVC: UITableViewController {
             cell.titleLabel.text = data.title
             cell.subTitleLabel.text = data.previewText
             
-            self.labelsSize.append(cell.subTitleLabel.calculateMaxLines())
+            let maxLines = cell.subTitleLabel.calculateMaxLines()
             
             switch eachCellStatus[indexPath.row] {
             case true:
-                if  self.labelsSize[indexPath.row] <= 2 {
+                
+                if  maxLines == 1 || maxLines == 2 {
                     cell.expandButton.isHidden = true
                     cell.subTitleLabel.numberOfLines = 2
+                
                 }
-                cell.subTitleLabel.numberOfLines = 2
+                
+                if maxLines > 2 || maxLines == 0 {
+                    cell.subTitleLabel.numberOfLines = 2
+                }
+
             case false:
                 cell.subTitleLabel.numberOfLines = 0
             }
@@ -209,8 +244,12 @@ class NewslineVC: UITableViewController {
             cell.onButtonClick = { button in
                 self.eachCellStatus[indexPath.row].toggle()
                 cell.updateButtonTitle(expandStatus: self.eachCellStatus[indexPath.row])
-                tableView.reloadRows(at: [indexPath], with: .automatic)
+                
+                UIView.animate(withDuration: 0.3, delay: 0.3, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.3, options: .autoreverse) {
+                    self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                }
             }
+            
             return cell
         }
         
@@ -219,35 +258,61 @@ class NewslineVC: UITableViewController {
     
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        func showGoToDetailAlert() {
+            self.tableView.reloadData()
+            let alertController = UIAlertController(title: "Skip to post details?", message: nil, preferredStyle: .alert)
+            
+            let yesButton = UIAlertAction(title: "Yes", style: .default) { _ in
+                setData()
+            }
+            let cancelButton = UIAlertAction(title: "Cancel", style: .destructive, handler: nil)
+            
+            alertController.addAction(cancelButton)
+            alertController.addAction(yesButton)
+            
+            self.present(alertController, animated: true, completion: nil)
+        }
+        
+        
         let postID = dataSourse[indexPath.row].postID
 
         detailPostURL = "https://raw.githubusercontent.com/anton-natife/jsons/master/api/posts/\(postID!).json"
         dowloadDetailPostData(urlString: detailPostURL)
         let detailVC = storyboard?.instantiateViewController(withIdentifier: "DetailVC") as? DetailVC
-
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+        showGoToDetailAlert()
+
+        func setData() {
             
-            if let imageURL = self.postDatailData?.postImage  {
-                let url = URL(string: imageURL)
-                if let data = try? Data(contentsOf: url!) {
-                    detailVC?.postImageView.image = UIImage(data: data)
+            if !dataSourse.isEmpty {
+                if let imageURL = self.postDatailData?.postImage  {
+                    let url = URL(string: imageURL)
+                    if let data = try? Data(contentsOf: url!) {
+                        detailVC?.postImageView.image = UIImage(data: data)!
+                    }
+                }
+                
+                detailVC?.titleLabel.text = self.postDatailData?.title ?? ""
+                detailVC?.subtitleLabel.text = self.postDatailData?.text ?? ""
+                detailVC?.likesCountLabel.text = "\(self.postDatailData?.likesCount ?? 0)"
+                
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateStyle = .long
+                dateFormatter.timeStyle = .none
+
+                let date = Date(timeIntervalSince1970:  Double(self.postDatailData?.timeshamp ?? 0))
+                dateFormatter.locale = Locale(identifier: "en_UK")
+                detailVC?.dateOfPublicationLabel.text = "\(dateFormatter.string(from: date))"
+            }
+
+            if !dataSourse.isEmpty {
+                self.navigationController?.pushViewController(detailVC!, animated: true)
+            } else {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    self.navigationController?.pushViewController(detailVC!, animated: true)
                 }
             }
-            
-            detailVC?.titleLabel.text = self.postDatailData?.title
-            detailVC?.subtitleLabel.text = self.postDatailData?.text
-            detailVC?.likesCountLabel.text = "\(self.postDatailData?.likesCount ?? 0)"
-            
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateStyle = .long
-            dateFormatter.timeStyle = .none
-    
-            let date = Date(timeIntervalSince1970:  Double(self.postDatailData?.timeshamp ?? 0))
-            dateFormatter.locale = Locale(identifier: "en_UK")
-            detailVC?.dateOfPublicationLabel.text = "\(dateFormatter.string(from: date))"
-            
-            self.navigationController?.pushViewController(detailVC!, animated: true)
         }
         
     }

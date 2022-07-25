@@ -9,6 +9,8 @@ import UIKit
 
 class NewslineCell: UITableViewCell {
     
+    static let identifier = "newslineCell"
+    
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var subTitleLabel: UILabel!
     @IBOutlet weak var likesCountLabel: UILabel!

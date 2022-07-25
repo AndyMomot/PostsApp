@@ -1,13 +1,7 @@
-//
-//  DetailVC.swift
-//  PostsApp
-//
-//  Created by Андрей on 22.07.2022.
-//
-
 import UIKit
 
 class DetailVC: UIViewController {
+    
     
     var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -68,25 +62,16 @@ class DetailVC: UIViewController {
         label.numberOfLines = 1
         return label
     }()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setContentView()
         setScrollView()
         setCinstraints()
     }
     
     func setContentView() {
-        let stringHeight = 130
-        
-        let postImageViewHeight = view.frame.size.width
-        let titleLabelHeight: CGFloat = CGFloat(titleLabel.calculateMaxLines() * stringHeight)
-        let subtitleLabelHeight: CGFloat = CGFloat(subtitleLabel.calculateMaxLines() * stringHeight)
-
-        let height = postImageViewHeight + titleLabelHeight + subtitleLabelHeight
-
-        contentView.frame = CGRect(x: 0, y: 0, width: view.frame.size.width, height: height)
+        contentView.frame = CGRect(x: 0, y: 0, width: view.frame.size.width, height: view.frame.size.height)
         contentView.addSubview(postImageView)
         contentView.addSubview(titleLabel)
         contentView.addSubview(subtitleLabel)
@@ -94,7 +79,6 @@ class DetailVC: UIViewController {
         contentView.addSubview(likesCountLabel)
         contentView.addSubview(dateOfPublicationLabel)
     }
-    
     func setScrollView() {
         scrollView = UIScrollView(frame: view.bounds)
         scrollView.addSubview(contentView)
@@ -102,7 +86,7 @@ class DetailVC: UIViewController {
         scrollView.showsVerticalScrollIndicator = false
         self.view.addSubview(scrollView)
     }
-    
+
     func setCinstraints() {
         [
             postImageView,
@@ -112,14 +96,14 @@ class DetailVC: UIViewController {
             likesCountLabel,
             dateOfPublicationLabel
         ].forEach({$0.translatesAutoresizingMaskIntoConstraints = false})
-        
+
         [
             postImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
             postImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             postImageView.heightAnchor.constraint(equalToConstant: view.frame.size.width),
             postImageView.widthAnchor.constraint(equalToConstant: view.frame.size.width)
         ].forEach({$0.isActive = true})
-        
+
         [
             titleLabel.topAnchor.constraint(equalTo: postImageView.bottomAnchor, constant: 20),
             titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
@@ -138,7 +122,7 @@ class DetailVC: UIViewController {
             likeImage.widthAnchor.constraint(equalToConstant: 20),
             likeImage.heightAnchor.constraint(equalToConstant: 20)
         ].forEach({$0.isActive = true})
-        
+
         [
             likesCountLabel.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 20),
             likesCountLabel.leadingAnchor.constraint(equalTo: likeImage.trailingAnchor, constant: 5),
@@ -150,7 +134,25 @@ class DetailVC: UIViewController {
             dateOfPublicationLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             likesCountLabel.heightAnchor.constraint(equalToConstant: 20)
         ].forEach({$0.isActive = true})
-        
+
     }
   
+    func updateContentViewFrame() {
+        let postImageViewHeight = view.frame.size.width
+        let titleLabelHeight = titleLabel.frame.size.height
+        let subtitleLabelHeight = subtitleLabel.frame.size.height
+
+        let height = postImageViewHeight + titleLabelHeight + subtitleLabelHeight + 100
+        contentView.frame = CGRect(x: 0, y: 0, width: view.frame.size.width, height: height)
+        
+        scrollView.contentSize = self.contentView.bounds.size
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        updateContentViewFrame()
+    }
+
+    
+    
 }
