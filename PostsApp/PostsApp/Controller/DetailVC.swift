@@ -16,7 +16,7 @@ class DetailVC: UIViewController {
     }()
     
     var postImageView: UIImageView = {
-        let image = UIImage(named: "image")
+        let image = UIImage(named: "without_Internet.png")
         var postImageView = UIImageView(image: image)
         postImageView.contentMode = .scaleAspectFit
         return postImageView
@@ -47,7 +47,6 @@ class DetailVC: UIViewController {
     
     var likesCountLabel: UILabel = {
         let label = UILabel()
-        label.text = "1957"
         label.font = UIFont(name: "Avenir Medium", size: 16)
         label.textColor = .secondaryLabel
         label.numberOfLines = 1
@@ -56,7 +55,6 @@ class DetailVC: UIViewController {
     
     var dateOfPublicationLabel: UILabel = {
         let label = UILabel()
-        label.text = "21 days ago"
         label.font = UIFont(name: "Avenir Medium", size: 16)
         label.textColor = .secondaryLabel
         label.numberOfLines = 1
